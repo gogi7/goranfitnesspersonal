@@ -93,8 +93,7 @@ export function Weight() {
             goalWeight={user.goalWeight}
             goalDate={end}
             today={todayISO()}
-            width={1100}
-            height={280}
+            height={320}
           />
         </div>
 

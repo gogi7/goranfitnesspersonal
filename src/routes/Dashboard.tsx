@@ -253,7 +253,6 @@ export function Dashboard() {
             goalWeight={user.goalWeight}
             goalDate={end}
             today={today}
-            width={720}
             height={220}
           />
         </div>
