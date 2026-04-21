@@ -7,76 +7,55 @@ import type {
   ExerciseEntry,
   Pace,
   PhotoMeta,
+  ThemeMode,
   UserProfile,
-  WeightEntry,
 } from './types';
 import { todayISO, uid, hoursBetween, nowISO } from './dates';
 
-// Seed data — from design/.../src/data.jsx. User can overwrite via log actions.
-const SEED_USER: UserProfile = {
-  name: 'Goran Babić',
-  dob: '1984-11-10',
-  age: 41,
-  sex: 'male',
-  heightCm: 180,
-  startWeight: 109.4,
-  startDate: '2026-04-01',
-  goalWeight: 79.0,
-  activityFactor: 1.375,
-  activityLabel: 'Lightly active · tennis 1×/wk + desk',
-  conditions: ['Prefer low-impact — stone legs', 'No running / soccer'],
-  proteinTargetG: 160,
-  carbTargetG: 160,
-  fatTargetG: 55,
-};
+// Fresh-start seed: user hasn't logged anything yet. Profile keeps
+// sensible defaults that can be edited in Settings. The first weight
+// log automatically becomes the baseline (see logWeight action).
+function makeInitialState(): AppState {
+  const today = todayISO();
+  const baseUser: UserProfile = {
+    name: 'Goran Babić',
+    dob: '1984-11-10',
+    age: 41,
+    sex: 'male',
+    heightCm: 180,
+    startWeight: 0,
+    startDate: today,
+    goalWeight: 79.0,
+    activityFactor: 1.375,
+    activityLabel: 'Lightly active · tennis 1×/wk + desk',
+    conditions: ['Prefer low-impact — stone legs', 'No running / soccer'],
+    proteinTargetG: 160,
+    carbTargetG: 160,
+    fatTargetG: 55,
+  };
+  return {
+    user: baseUser,
+    weightLog: [],
+    foodLog: [],
+    fasting: {
+      active: false,
+      startedAt: null,
+      plan: '16:8',
+      goalHours: 16,
+      history: [],
+    },
+    exerciseLog: [],
+    photos: [],
+    prefs: {
+      paceKgPerWeek: 1.0,
+      fastingPlanDefault: '16:8',
+      fastingGoalDefaultHours: 16,
+      theme: 'system',
+    },
+  };
+}
 
-const SEED_WEIGHT: WeightEntry[] = [
-  { date: '2026-04-01', kg: 109.4 },
-  { date: '2026-04-03', kg: 109.1 },
-  { date: '2026-04-05', kg: 108.8 },
-  { date: '2026-04-07', kg: 108.9 },
-  { date: '2026-04-09', kg: 108.5 },
-  { date: '2026-04-11', kg: 108.2 },
-  { date: '2026-04-13', kg: 108.0 },
-  { date: '2026-04-15', kg: 107.8 },
-  { date: '2026-04-17', kg: 107.6 },
-  { date: '2026-04-19', kg: 107.3 },
-  { date: '2026-04-21', kg: 107.0 },
-];
-
-const SEED_FOOD: FoodEntry[] = [
-  { id: 'f1', date: '2026-04-21', meal: 'Breakfast', time: '08:10', name: 'Greek yogurt + berries + walnuts', kcal: 320, p: 22, c: 28, f: 14 },
-  { id: 'f2', date: '2026-04-21', meal: 'Lunch', time: '12:45', name: 'Grilled chicken bowl · quinoa · greens', kcal: 520, p: 48, c: 46, f: 16 },
-  { id: 'f3', date: '2026-04-21', meal: 'Snack', time: '15:30', name: 'Apple + almonds (20g)', kcal: 190, p: 5, c: 22, f: 11 },
-];
-
-const SEED_EXERCISE: ExerciseEntry[] = [
-  { id: 'e1', date: '2026-04-21', type: 'Walk', minutes: 35, kcal: 160, impact: 'low' },
-  { id: 'e2', date: '2026-04-19', type: 'Tennis · singles', minutes: 75, kcal: 640, impact: 'med' },
-  { id: 'e3', date: '2026-04-18', type: 'Stationary bike', minutes: 30, kcal: 280, impact: 'low' },
-  { id: 'e4', date: '2026-04-16', type: 'Swim · freestyle', minutes: 40, kcal: 380, impact: 'low' },
-  { id: 'e5', date: '2026-04-14', type: 'Walk', minutes: 45, kcal: 210, impact: 'low' },
-];
-
-export const INITIAL_STATE: AppState = {
-  user: SEED_USER,
-  weightLog: SEED_WEIGHT,
-  foodLog: SEED_FOOD,
-  fasting: {
-    active: false,
-    startedAt: null,
-    plan: '16:8',
-    goalHours: 16,
-    history: [],
-  },
-  exerciseLog: SEED_EXERCISE,
-  photos: [],
-  prefs: {
-    paceKgPerWeek: 1.0,
-    fastingPlanDefault: '16:8',
-    fastingGoalDefaultHours: 16,
-  },
-};
+export const INITIAL_STATE: AppState = makeInitialState();
 
 interface Actions {
   logWeight: (kg: number, date?: string) => void;
@@ -89,6 +68,7 @@ interface Actions {
   addExercise: (entry: Omit<ExerciseEntry, 'id'>) => void;
   deleteExercise: (id: string) => void;
   setPace: (p: Pace) => void;
+  setTheme: (theme: ThemeMode) => void;
   updateUser: (patch: Partial<UserProfile>) => void;
   addPhotoMeta: (meta: Omit<PhotoMeta, 'id'>) => string;
   deletePhotoMeta: (id: string) => void;
@@ -109,6 +89,20 @@ export const useStore = create<AppState & Actions>()(
           const next = [...filtered, { date: d, kg }].sort((a, b) =>
             a.date.localeCompare(b.date)
           );
+          // First weight entry establishes the baseline. Also catches
+          // the case where the user edited profile but never logged.
+          const firstEntry = s.weightLog.length === 0;
+          const userNeedsBaseline = s.user.startWeight <= 0;
+          if (firstEntry || userNeedsBaseline) {
+            return {
+              weightLog: next,
+              user: {
+                ...s.user,
+                startWeight: kg,
+                startDate: d,
+              },
+            };
+          }
           return { weightLog: next };
         }),
 
@@ -169,6 +163,8 @@ export const useStore = create<AppState & Actions>()(
 
       setPace: (p) => set((s) => ({ prefs: { ...s.prefs, paceKgPerWeek: p } })),
 
+      setTheme: (theme) => set((s) => ({ prefs: { ...s.prefs, theme } })),
+
       updateUser: (patch) => set((s) => ({ user: { ...s.user, ...patch } })),
 
       addPhotoMeta: (meta) => {
@@ -219,11 +215,26 @@ export const useStore = create<AppState & Actions>()(
         }
       },
 
-      reset: () => set(() => ({ ...INITIAL_STATE })),
+      reset: () => set(() => ({ ...makeInitialState() })),
     }),
     {
       name: 'pulse:v1',
-      version: 1,
+      version: 2,
+      migrate: (persisted, version) => {
+        // v1 -> v2: wipe the demo seed (user hasn't actually started yet)
+        // and add theme preference. Keeps profile edits though.
+        if (version < 2) {
+          const fresh = makeInitialState();
+          const prev = persisted as Partial<AppState> | undefined;
+          return {
+            ...fresh,
+            user: prev?.user
+              ? { ...fresh.user, ...prev.user, startWeight: 0, startDate: fresh.user.startDate }
+              : fresh.user,
+          };
+        }
+        return persisted as AppState;
+      },
     }
   )
 );

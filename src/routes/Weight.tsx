@@ -39,11 +39,15 @@ export function Weight() {
         <div>
           <h1 className="page-title">Weight</h1>
           <div className="page-sub">
-            {kg.toFixed(1)} kg · −{lost} kg since start ·{' '}
-            {user.startWeight > user.goalWeight
-              ? Math.round(((user.startWeight - kg) / (user.startWeight - user.goalWeight)) * 100)
-              : 0}
-            % of the way to {user.goalWeight} kg
+            {sorted.length === 0
+              ? 'Log your first weight to start the trend.'
+              : `${kg.toFixed(1)} kg · −${lost} kg since start · ${
+                  user.startWeight > user.goalWeight
+                    ? Math.round(
+                        ((user.startWeight - kg) / (user.startWeight - user.goalWeight)) * 100
+                      )
+                    : 0
+                }% of the way to ${user.goalWeight} kg`}
           </div>
         </div>
         <button className="px-btn is-primary" onClick={() => setModal(true)}>
@@ -52,22 +56,32 @@ export function Weight() {
       </div>
 
       <div className="stack-lg">
-        <div className="px-card" style={{ padding: 20 }}>
-          <div className="px-caption">Today · {fmtDateShort(todayISO())}</div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 4 }}>
-            <span
-              className="px-num"
-              style={{ fontSize: 52, fontWeight: 700, letterSpacing: '-1.4px', lineHeight: 1 }}
-            >
-              {kg.toFixed(1)}
-            </span>
-            <span style={{ fontSize: 18, color: '#6a6a6a', fontWeight: 600 }}>kg</span>
+        {sorted.length > 0 && (
+          <div className="px-card" style={{ padding: 20 }}>
+            <div className="px-caption">Today · {fmtDateShort(todayISO())}</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 4 }}>
+              <span
+                className="px-num"
+                style={{
+                  fontSize: 52,
+                  fontWeight: 700,
+                  letterSpacing: '-1.4px',
+                  lineHeight: 1,
+                }}
+              >
+                {kg.toFixed(1)}
+              </span>
+              <span style={{ fontSize: 18, color: 'var(--pulse-muted)', fontWeight: 600 }}>
+                kg
+              </span>
+            </div>
+            <div className="px-meta-sm" style={{ marginTop: 8 }}>
+              Projected {user.goalWeight} kg by{' '}
+              <b style={{ color: 'var(--pulse-ink)' }}>{fmtDate(end)}</b> · {weeksRemaining}{' '}
+              weeks at {prefs.paceKgPerWeek.toFixed(2)} kg/wk
+            </div>
           </div>
-          <div className="px-meta-sm" style={{ marginTop: 8 }}>
-            Projected {user.goalWeight} kg by <b style={{ color: '#222' }}>{fmtDate(end)}</b> ·{' '}
-            {weeksRemaining} weeks at {prefs.paceKgPerWeek.toFixed(2)} kg/wk
-          </div>
-        </div>
+        )}
 
         <div className="px-card" style={{ padding: 16 }}>
           <div className="px-title-sm" style={{ marginBottom: 8 }}>

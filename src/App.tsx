@@ -2,6 +2,8 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { Sidebar } from './components/Sidebar';
 import { BottomTabs } from './components/BottomTabs';
 import { MobileHeader } from './components/MobileHeader';
+import { useStore } from './lib/store';
+import { useApplyTheme } from './lib/theme';
 import { Dashboard } from './routes/Dashboard';
 import { Weight } from './routes/Weight';
 import { Food } from './routes/Food';
@@ -40,6 +42,8 @@ export function App() {
   const loc = useLocation();
   const title = ROUTE_TITLES[loc.pathname];
   const showBack = loc.pathname !== '/';
+  const theme = useStore((s) => s.prefs.theme);
+  useApplyTheme(theme);
   return (
     <div className="app-root">
       {/* Mobile shell */}

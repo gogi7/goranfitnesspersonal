@@ -1,6 +1,7 @@
 import { useStore } from '../lib/store';
 import { NavLink } from 'react-router-dom';
 import { Icon } from './Icon';
+import { ThemeToggle } from './ThemeToggle';
 
 interface Props {
   title?: string;
@@ -30,9 +31,12 @@ export function MobileHeader({ title, showBack }: Props) {
           </div>
         </div>
       )}
-      <NavLink to="/settings" className="app-avatar" aria-label="Settings">
-        {initials}
-      </NavLink>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <ThemeToggle compact />
+        <NavLink to="/settings" className="app-avatar" aria-label="Settings">
+          {initials}
+        </NavLink>
+      </div>
     </header>
   );
 }

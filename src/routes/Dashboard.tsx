@@ -87,8 +87,14 @@ export function Dashboard() {
         <div>
           <h1 className="page-title">Good day, {user.name.split(' ')[0]}</h1>
           <div className="page-sub">
-            {fmtDate(new Date())} · {weeksRemaining} weeks to {user.goalWeight} kg at{' '}
-            {prefs.paceKgPerWeek.toFixed(2)} kg/wk
+            {fmtDate(new Date())}
+            {weightLog.length > 0 && (
+              <>
+                {' · '}
+                {weeksRemaining} weeks to {user.goalWeight} kg at{' '}
+                {prefs.paceKgPerWeek.toFixed(2)} kg/wk
+              </>
+            )}
           </div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
@@ -101,84 +107,126 @@ export function Dashboard() {
       <div className="stack-lg">
         {/* Hero card */}
         <div className="px-card" style={{ padding: 20 }}>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              gap: 16,
-              flexWrap: 'wrap',
-            }}
-          >
-            <div style={{ flex: '1 1 220px' }}>
-              <div className="px-caption">Current weight</div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 6 }}>
-                <span
-                  className="px-num"
-                  style={{ fontSize: 48, fontWeight: 700, letterSpacing: '-1.2px', lineHeight: 1 }}
+          {weightLog.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '8px 0 4px' }}>
+              <div
+                style={{
+                  fontSize: 20,
+                  fontWeight: 700,
+                  letterSpacing: '-0.4px',
+                  marginBottom: 6,
+                }}
+              >
+                Ready when you are
+              </div>
+              <div className="px-meta-sm" style={{ marginBottom: 16 }}>
+                Log your first weight — that becomes your baseline, and the rest of Pulse
+                turns on.
+              </div>
+              <button className="px-btn is-primary" onClick={() => setModal('weight')}>
+                <Icon.plus size={16} /> Log your first weight
+              </button>
+            </div>
+          ) : (
+            <>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  gap: 16,
+                  flexWrap: 'wrap',
+                }}
+              >
+                <div style={{ flex: '1 1 220px' }}>
+                  <div className="px-caption">Current weight</div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 6 }}>
+                    <span
+                      className="px-num"
+                      style={{
+                        fontSize: 48,
+                        fontWeight: 700,
+                        letterSpacing: '-1.2px',
+                        lineHeight: 1,
+                      }}
+                    >
+                      {kg.toFixed(1)}
+                    </span>
+                    <span
+                      style={{ fontSize: 16, color: 'var(--pulse-muted)', fontWeight: 600 }}
+                    >
+                      kg
+                    </span>
+                  </div>
+                  <div
+                    style={{ display: 'flex', gap: 8, marginTop: 10, alignItems: 'center' }}
+                  >
+                    {lost > 0 ? (
+                      <span className="px-badge is-ok">
+                        <Icon.arrowDown size={10} /> −{lost} kg
+                      </span>
+                    ) : (
+                      <span className="px-badge is-neutral">Baseline</span>
+                    )}
+                    <span className="px-meta-sm">since {fmtDateShort(user.startDate)}</span>
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div className="px-caption">BMI</div>
+                  <div
+                    className="px-num"
+                    style={{
+                      fontSize: 24,
+                      fontWeight: 700,
+                      letterSpacing: '-0.44px',
+                      marginTop: 4,
+                    }}
+                  >
+                    {bmiV.toFixed(1)}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color:
+                        bmiCls.tone === 'ok'
+                          ? '#16a34a'
+                          : bmiCls.tone === 'warn'
+                          ? '#f59e0b'
+                          : '#ff385c',
+                      fontWeight: 700,
+                      marginTop: 2,
+                    }}
+                  >
+                    {bmiCls.label}
+                  </div>
+                </div>
+              </div>
+              <div style={{ marginTop: 16 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    marginBottom: 6,
+                  }}
                 >
-                  {kg.toFixed(1)}
-                </span>
-                <span style={{ fontSize: 16, color: '#6a6a6a', fontWeight: 600 }}>kg</span>
-              </div>
-              <div style={{ display: 'flex', gap: 8, marginTop: 10, alignItems: 'center' }}>
-                {lost > 0 ? (
-                  <span className="px-badge is-ok">
-                    <Icon.arrowDown size={10} /> −{lost} kg
+                  <span className="px-meta-sm">{kg.toFixed(1)} kg</span>
+                  <span className="px-meta-sm">
+                    Goal · {user.goalWeight.toFixed(1)} kg
                   </span>
-                ) : (
-                  <span className="px-badge is-neutral">First entry</span>
-                )}
-                <span className="px-meta-sm">since {fmtDateShort(user.startDate)}</span>
+                </div>
+                <div className="px-bar is-accent">
+                  <i style={{ width: `${Math.max(0, Math.min(100, progressPct))}%` }} />
+                </div>
+                <div className="px-meta-sm" style={{ marginTop: 8 }}>
+                  {toGo.toFixed(1)} kg to goal · projected{' '}
+                  <b style={{ color: 'var(--pulse-ink)' }}>{fmtDateShort(end)}</b> at{' '}
+                  {prefs.paceKgPerWeek.toFixed(2)} kg/wk
+                </div>
               </div>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <div className="px-caption">BMI</div>
-              <div
-                className="px-num"
-                style={{
-                  fontSize: 24,
-                  fontWeight: 700,
-                  letterSpacing: '-0.44px',
-                  marginTop: 4,
-                }}
-              >
-                {bmiV.toFixed(1)}
-              </div>
-              <div
-                style={{
-                  fontSize: 11,
-                  color: bmiCls.tone === 'ok' ? '#16a34a' : bmiCls.tone === 'warn' ? '#f59e0b' : '#ff385c',
-                  fontWeight: 700,
-                  marginTop: 2,
-                }}
-              >
-                {bmiCls.label}
-              </div>
-            </div>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                fontSize: 12,
-                fontWeight: 600,
-                marginBottom: 6,
-              }}
-            >
-              <span className="px-meta-sm">{kg.toFixed(1)} kg</span>
-              <span className="px-meta-sm">Goal · {user.goalWeight.toFixed(1)} kg</span>
-            </div>
-            <div className="px-bar is-accent">
-              <i style={{ width: `${Math.max(0, Math.min(100, progressPct))}%` }} />
-            </div>
-            <div className="px-meta-sm" style={{ marginTop: 8 }}>
-              {toGo.toFixed(1)} kg to goal · projected{' '}
-              <b style={{ color: '#222' }}>{fmtDateShort(end)}</b> at{' '}
-              {prefs.paceKgPerWeek.toFixed(2)} kg/wk
-            </div>
-          </div>
+            </>
+          )}
         </div>
 
         {/* Weight chart */}
@@ -296,11 +344,11 @@ export function Dashboard() {
           <div
             style={{
               marginTop: 10,
-              background: '#fff0f3',
+              background: 'var(--pulse-accent-tint)',
               padding: '10px 12px',
               borderRadius: 10,
               fontSize: 12,
-              color: '#be123c',
+              color: 'var(--pulse-accent)',
               fontWeight: 600,
               display: 'flex',
               gap: 8,
@@ -320,7 +368,7 @@ export function Dashboard() {
             <QuickTile
               icon={<Icon.scale size={18} />}
               label="Weight"
-              sub={`Last: ${kg.toFixed(1)} kg`}
+              sub={weightLog.length ? `Last: ${kg.toFixed(1)} kg` : 'Log your first'}
               onClick={() => setModal('weight')}
             />
             <QuickTile
@@ -352,43 +400,47 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* Roadmap preview */}
-        <div
-          className="px-card lift"
-          onClick={() => navigate('/roadmap')}
-          style={{ padding: 16, cursor: 'pointer' }}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') navigate('/roadmap');
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: 14,
-                background: 'linear-gradient(180deg,#fde0e4,#f4b3bc)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#be123c',
-              }}
-            >
-              <Icon.trophy size={24} />
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.3px' }}>
-                On pace to hit {user.goalWeight} kg by {fmtDateShort(end)}
+        {/* Roadmap preview (only when user has data) */}
+        {weightLog.length > 0 && (
+          <div
+            className="px-card lift"
+            onClick={() => navigate('/roadmap')}
+            style={{ padding: 16, cursor: 'pointer' }}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') navigate('/roadmap');
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: 14,
+                  background:
+                    'linear-gradient(180deg, var(--pulse-weight-from), var(--pulse-weight-to))',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--pulse-weight-ink)',
+                }}
+              >
+                <Icon.trophy size={24} />
               </div>
-              <div className="px-meta-sm" style={{ marginTop: 2 }}>
-                {weeksRemaining} weeks · {prefs.paceKgPerWeek.toFixed(2)} kg/wk · see full roadmap
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.3px' }}>
+                  On pace to hit {user.goalWeight} kg by {fmtDateShort(end)}
+                </div>
+                <div className="px-meta-sm" style={{ marginTop: 2 }}>
+                  {weeksRemaining} weeks · {prefs.paceKgPerWeek.toFixed(2)} kg/wk · see full
+                  roadmap
+                </div>
               </div>
+              <Icon.chevronR size={14} />
             </div>
-            <Icon.chevronR size={14} />
           </div>
-        </div>
+        )}
       </div>
 
       <Modal open={modal === 'weight'} title="Log weight" onClose={closeModal}>

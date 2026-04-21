@@ -1,0 +1,237 @@
+/* Dark theme overrides.
+   Activated by [data-theme="dark"] on <html>.
+   The Pulse design system is light-first; these values are tuned
+   to preserve contrast & the Rausch accent while swapping surfaces. */
+
+[data-theme='dark'] {
+  /* Surface */
+  --sa-bg: #0b0b0d;
+  --sa-surface: #17171a;
+  --sa-surface-alt: #1f1f23;
+  --sa-scrim: rgba(0, 0, 0, 0.72);
+
+  /* Foreground */
+  --sa-fg: #f2f2f3;
+  --sa-fg-muted: #a0a0a6;
+  --sa-fg-subtle: #6b6b72;
+  --sa-divider: #2a2a2f;
+  --sa-divider-strong: #3a3a40;
+
+  /* Brand stays the same — Rausch red reads well on dark. */
+
+  /* Three-layer card shadow becomes a stroke + subtle lift on dark. */
+  --sa-shadow-1:
+    rgba(255, 255, 255, 0.06) 0 0 0 1px,
+    rgba(0, 0, 0, 0.35) 0 2px 8px,
+    rgba(0, 0, 0, 0.45) 0 6px 18px;
+  --sa-shadow-2:
+    rgba(255, 255, 255, 0.08) 0 0 0 1px,
+    rgba(0, 0, 0, 0.5) 0 8px 22px,
+    rgba(0, 0, 0, 0.55) 0 16px 36px;
+  --sa-shadow-3:
+    rgba(255, 255, 255, 0.08) 0 0 0 1px,
+    rgba(0, 0, 0, 0.55) 0 14px 34px,
+    rgba(0, 0, 0, 0.6) 0 24px 58px;
+
+  --sa-focus-ring: 0 0 0 2px #0b0b0d, 0 0 0 4px #f2f2f3;
+
+  /* Pulse-scoped semantic vars (from health.css) */
+  --pulse-ink: #f2f2f3;
+  --pulse-muted: #a0a0a6;
+  --pulse-subtle: #6b6b72;
+  --pulse-hair: #2a2a2f;
+  --pulse-hair-strong: #3a3a40;
+  --pulse-surface-alt: #1f1f23;
+  --pulse-accent-tint: #3a1020;
+
+  /* Activity / log category tints — darker versions */
+  --pulse-weight-from: #3a1a24;
+  --pulse-weight-to: #5a1f2f;
+  --pulse-weight-ink: #fbb6c2;
+  --pulse-food-from: #3a2d18;
+  --pulse-food-to: #5a421f;
+  --pulse-food-ink: #fbcf91;
+  --pulse-fast-from: #2a1f3a;
+  --pulse-fast-to: #3e2b5a;
+  --pulse-fast-ink: #d4bff2;
+  --pulse-move-from: #13332f;
+  --pulse-move-to: #1a4a42;
+  --pulse-move-ink: #9be0d0;
+
+  color-scheme: dark;
+}
+
+/* Use the tokens so the whole app switches with one attribute. */
+[data-theme='dark'] body,
+[data-theme='dark'] html {
+  background: var(--sa-bg);
+  color: var(--sa-fg);
+}
+
+/* Cards — surface instead of pure white */
+[data-theme='dark'] .px-card {
+  background: var(--sa-surface);
+  box-shadow: var(--sa-shadow-1);
+}
+[data-theme='dark'] .px-card.is-flat {
+  box-shadow: rgba(255, 255, 255, 0.06) 0 0 0 1px;
+}
+[data-theme='dark'] .px-card.lift:hover {
+  box-shadow: var(--sa-shadow-2);
+}
+
+/* Inputs */
+[data-theme='dark'] .px-input {
+  background: var(--sa-surface-alt);
+  color: var(--sa-fg);
+  border-color: var(--pulse-hair-strong);
+}
+[data-theme='dark'] .px-input:focus {
+  border-color: var(--sa-fg);
+}
+
+/* Pills */
+[data-theme='dark'] .px-pill {
+  background: var(--sa-surface);
+  color: var(--sa-fg);
+  border-color: var(--pulse-hair-strong);
+}
+[data-theme='dark'] .px-pill:hover {
+  background: var(--sa-surface-alt);
+}
+[data-theme='dark'] .px-pill.is-sel {
+  border-color: var(--sa-fg);
+}
+
+/* Buttons */
+[data-theme='dark'] .px-btn.is-secondary {
+  background: var(--sa-surface);
+  color: var(--sa-fg);
+  border-color: var(--pulse-hair-strong);
+}
+[data-theme='dark'] .px-btn.is-secondary:hover {
+  background: var(--sa-surface-alt);
+  border-color: var(--sa-fg);
+}
+[data-theme='dark'] .px-btn.is-ghost {
+  color: var(--sa-fg);
+}
+[data-theme='dark'] .px-btn.is-ghost:hover {
+  background: var(--sa-surface-alt);
+}
+
+/* Progress bar track */
+[data-theme='dark'] .px-bar {
+  background: var(--pulse-hair);
+}
+[data-theme='dark'] .px-bar > i {
+  background: var(--sa-fg);
+}
+
+/* Ring center fill (the hole in the donut) */
+[data-theme='dark'] .px-ring::after {
+  background: var(--sa-bg);
+}
+
+/* Divider */
+[data-theme='dark'] .px-hr {
+  background: var(--pulse-hair);
+}
+
+/* Badges — retune light-surface badges to dark */
+[data-theme='dark'] .px-badge.is-ok {
+  background: #13331e;
+  color: #6fd093;
+}
+[data-theme='dark'] .px-badge.is-warn {
+  background: #3a2a10;
+  color: #fcc06b;
+}
+[data-theme='dark'] .px-badge.is-bad {
+  background: #3a1020;
+  color: #ff8ba1;
+}
+[data-theme='dark'] .px-badge.is-neutral {
+  background: var(--sa-surface-alt);
+  color: var(--sa-fg);
+}
+
+/* App shell */
+[data-theme='dark'] .app-root {
+  background: var(--sa-bg);
+  color: var(--sa-fg);
+}
+[data-theme='dark'] .app-mobile-header {
+  background: var(--sa-bg);
+}
+[data-theme='dark'] .bottom-tabs {
+  background: rgba(17, 17, 20, 0.9);
+  border-top-color: var(--pulse-hair);
+}
+[data-theme='dark'] .app-desktop-sidebar {
+  border-right-color: var(--pulse-hair);
+}
+[data-theme='dark'] .sidebar-nav:hover {
+  background: var(--sa-surface-alt);
+}
+[data-theme='dark'] .sidebar-nav.is-active {
+  background: var(--sa-fg);
+  color: var(--sa-bg);
+}
+[data-theme='dark'] .sidebar-nav.is-active svg {
+  color: var(--sa-bg);
+}
+[data-theme='dark'] .sidebar-user {
+  border-top-color: var(--pulse-hair);
+}
+
+/* Modal */
+[data-theme='dark'] .modal-sheet {
+  background: var(--sa-surface);
+}
+
+/* Ghost "Rausch tint" panels on dashboard (inline gradient in Dashboard.tsx) */
+[data-theme='dark'] .px-card[style*='fff0f3'] {
+  background: linear-gradient(135deg, var(--sa-surface), #2a1220) !important;
+}
+
+/* Inline style overrides that the design used for card backgrounds */
+[data-theme='dark'] [style*='background:#f7f7f7'],
+[data-theme='dark'] [style*='background: #f7f7f7'] {
+  background: var(--sa-surface-alt) !important;
+}
+
+/* Empty states */
+[data-theme='dark'] .empty {
+  color: var(--sa-fg-muted);
+}
+
+/* File input button */
+[data-theme='dark'] input[type='file']::file-selector-button {
+  background: var(--sa-surface-alt);
+  color: var(--sa-fg);
+  border: 1px solid var(--pulse-hair-strong);
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+/* Date/time inputs — invert the calendar icon */
+[data-theme='dark'] input[type='date'],
+[data-theme='dark'] input[type='time'],
+[data-theme='dark'] input[type='datetime-local'] {
+  color-scheme: dark;
+}
+
+/* Smooth transitions when toggling */
+html,
+body,
+.px-card,
+.px-input,
+.px-pill,
+.px-btn,
+.app-mobile-header,
+.bottom-tabs,
+.app-desktop-sidebar,
+.modal-sheet {
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
