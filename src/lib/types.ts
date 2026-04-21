@@ -69,10 +69,13 @@ export interface PhotoMeta {
   label?: string;
 }
 
+export type ThemeMode = 'light' | 'dark' | 'system';
+
 export interface Preferences {
   paceKgPerWeek: Pace;
   fastingPlanDefault: FastingPlan;
   fastingGoalDefaultHours: number;
+  theme: ThemeMode;
 }
 
 export interface AppState {

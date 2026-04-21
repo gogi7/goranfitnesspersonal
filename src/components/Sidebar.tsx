@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { Icon } from './Icon';
 import { useStore } from '../lib/store';
+import { ThemeToggle } from './ThemeToggle';
 
 const items = [
   { to: '/', label: 'Dashboard', icon: Icon.home, end: true },
@@ -46,6 +47,7 @@ export function Sidebar() {
         </NavLink>
       ))}
       <div style={{ flex: 1 }} />
+      <ThemeToggle />
       <NavLink
         to="/settings"
         className={({ isActive }) => `sidebar-nav ${isActive ? 'is-active' : ''}`}
