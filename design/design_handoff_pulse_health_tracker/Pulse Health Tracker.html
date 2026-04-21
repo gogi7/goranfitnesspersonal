@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Pulse — Personal Health Tracker</title>
+<link rel="stylesheet" href="health.css"/>
+<style>
+  html, body { overscroll-behavior: none; }
+  .phone-shell {
+    width: 390px; height: 844px; border-radius: 44px; overflow: hidden;
+    position: relative; background: #fff;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.12), 0 0 0 10px #111, 0 0 0 11px #2a2a2a;
+  }
+  .phone-island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 110px; height: 32px; border-radius: 20px; background: #000; z-index: 50; }
+  .phone-statusbar { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; justify-content: space-between; align-items: center; padding: 18px 30px 0; z-index: 40; font-size: 15px; font-weight: 700; letter-spacing: -0.2px; pointer-events: none; }
+  .phone-statusbar .r { display: flex; gap: 5px; align-items: center; }
+  .web-shell { width: 1440px; height: 900px; border-radius: 14px; overflow: hidden; background: #fff; box-shadow: 0 20px 60px rgba(0,0,0,0.08), 0 0 0 1px #e6e6e6; display:flex; flex-direction:column; }
+  .web-chrome { height: 36px; background: #f4f4f2; border-bottom: 1px solid #e6e6e6; display: flex; align-items: center; padding: 0 14px; gap: 6px; flex-shrink:0; }
+  .web-chrome i { width: 12px; height: 12px; border-radius: 999px; display: inline-block; }
+  .web-chrome .url { flex: 1; text-align: center; font-size: 12px; color: #6a6a6a; font-family: var(--sa-font-mono); }
+  .web-body { flex: 1; overflow: hidden; display:flex; }
+  .web-body .px-web { transform-origin: 0 0; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="data.jsx"></script>
+<script type="text/babel" src="components.jsx"></script>
+<script type="text/babel" src="mobile.jsx"></script>
+<script type="text/babel" src="web.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+const { useState } = React;
+
+function PhoneFrame({ children }) {
+  return (
+    <div className="phone-shell">
+      <div className="phone-island"/>
+      <div className="phone-statusbar">
+        <span>9:41</span>
+        <div className="r">
+          <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="7" width="3" height="4" rx="0.6" fill="#000"/><rect x="4.5" y="5" width="3" height="6" rx="0.6" fill="#000"/><rect x="9" y="3" width="3" height="8" rx="0.6" fill="#000"/><rect x="13.5" y="1" width="3" height="10" rx="0.6" fill="#000"/></svg>
+          <svg width="16" height="11" viewBox="0 0 16 11"><path d="M8 3C10 3 11.5 3.8 12.8 4.9L14 3.7C12.3 2.1 10.3 1.2 8 1.2C5.7 1.2 3.7 2.1 2 3.7L3.2 4.9C4.5 3.8 6 3 8 3Z" fill="#000"/><path d="M8 6.5C9.1 6.5 10 7 10.7 7.6L12 6.4C10.9 5.3 9.5 4.7 8 4.7C6.5 4.7 5.1 5.3 4 6.4L5.3 7.6C6 7 6.9 6.5 8 6.5Z" fill="#000"/><circle cx="8" cy="9.5" r="1.2" fill="#000"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="#000" strokeOpacity="0.35" fill="none"/><rect x="2" y="2" width="19" height="8" rx="1.5" fill="#000"/></svg>
+        </div>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function WebFrame({ url, children, scale=1 }) {
+  return (
+    <div className="web-shell">
+      <div className="web-chrome">
+        <i style={{background:'#ff5f57'}}/><i style={{background:'#febc2e'}}/><i style={{background:'#28c840'}}/>
+        <div className="url">pulse.health / {url}</div>
+      </div>
+      <div className="web-body">
+        <div style={{transform:`scale(${scale})`, transformOrigin:'0 0', width: 1440, height: 900/scale}}>
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <DesignCanvas>
+
+      <DCSection id="overview" title="Pulse — Personal Health Tracker" subtitle="For Goran · 107.0 → 79.0 kg · low-impact friendly · Socket Atlas design system">
+        <DCArtboard id="mobile-dashboard" label="Mobile · Dashboard" width={390} height={844}>
+          <PhoneFrame><MobileApp initial="home"/></PhoneFrame>
+        </DCArtboard>
+        <DCArtboard id="web-dashboard" label="Web · Dashboard" width={1440} height={900}>
+          <WebFrame url="dashboard"><WebApp initial="home"/></WebFrame>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="mobile-screens" title="Mobile · all screens" subtitle="Tap any tab inside each phone to navigate. Screens are fully interactive.">
+        <DCArtboard id="m-weight" label="Weight log + trend" width={390} height={844}>
+          <PhoneFrame><MobileApp initial="weight"/></PhoneFrame>
+        </DCArtboard>
+        <DCArtboard id="m-food" label="Food log (P/C/F)" width={390} height={844}>
+          <PhoneFrame><MobileApp initial="food"/></PhoneFrame>
+        </DCArtboard>
+        <DCArtboard id="m-fast" label="Fasting timer" width={390} height={844}>
+          <PhoneFrame><MobileApp initial="fast"/></PhoneFrame>
+        </DCArtboard>
+        <DCArtboard id="m-exercise" label="Exercise (low-impact)" width={390} height={844}>
+          <PhoneFrame><MobileApp initial="exercise"/></PhoneFrame>
+        </DCArtboard>
+        <DCArtboard id="m-photos" label="Progress photos" width={390} height={844}>
+          <PhoneFrame><MobileApp initial="photos"/></PhoneFrame>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="roadmaps" title="Roadmap — three variations" subtitle="Tap the pace pills (0.5 / 0.75 / 1.0 kg/wk) to see the dates & milestones recompute. At 1.0 kg/wk you'll hit 79 kg in early Nov 2026.">
+        <DCArtboard id="roadmap-timeline" label="A · Linear timeline" width={1440} height={900}>
+          <WebFrame url="roadmap"><WebApp initial="roadmap" roadmapVariant="timeline"/></WebFrame>
+        </DCArtboard>
+        <DCArtboard id="roadmap-arc" label="B · Trajectory arc" width={1440} height={900}>
+          <WebFrame url="roadmap"><WebApp initial="roadmap" roadmapVariant="arc"/></WebFrame>
+        </DCArtboard>
+        <DCArtboard id="roadmap-stack" label="C · Milestone cards" width={1440} height={900}>
+          <WebFrame url="roadmap"><WebApp initial="roadmap" roadmapVariant="stack"/></WebFrame>
+        </DCArtboard>
+        <DCArtboard id="roadmap-mobile" label="Mobile · roadmap" width={390} height={844}>
+          <PhoneFrame><MobileApp initial="roadmap"/></PhoneFrame>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="web-screens" title="Web · sub-pages">
+        <DCArtboard id="w-weight" label="Weight trend (full)" width={1440} height={900}>
+          <WebFrame url="weight"><WebApp initial="weight"/></WebFrame>
+        </DCArtboard>
+        <DCArtboard id="w-food" label="Food log" width={1440} height={900}>
+          <WebFrame url="food"><WebApp initial="food"/></WebFrame>
+        </DCArtboard>
+        <DCArtboard id="w-fast" label="Fasting" width={1440} height={900}>
+          <WebFrame url="fasting"><WebApp initial="fast"/></WebFrame>
+        </DCArtboard>
+        <DCArtboard id="w-exercise" label="Exercise" width={1440} height={900}>
+          <WebFrame url="exercise"><WebApp initial="exercise"/></WebFrame>
+        </DCArtboard>
+        <DCArtboard id="w-photos" label="Progress photos" width={1440} height={900}>
+          <WebFrame url="photos"><WebApp initial="photos"/></WebFrame>
+        </DCArtboard>
+      </DCSection>
+
+      <DCPostIt top={0} left={40} rotate={-3} width={220}>
+        BMR 1,995 · TDEE 2,743 kcal/d.<br/>
+        Target 1,643 kcal/d for 1 kg/wk.<br/>
+        Goal date: early Nov 2026.
+      </DCPostIt>
+
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
